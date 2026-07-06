@@ -24,7 +24,7 @@
 | 8 | **F8 :** Gérer les états de fin de jeu et réinitialisation | fait | Écran "GAME OVER" si 0 vie ou aliens en bas. Écran "VICTORY" si grille vide. L'appui sur Entrée réinitialise scores/vies/jeu. | commit F8 |
 | 9 | **F11 :** Effets sonores 8-bit et particules d'explosions | fait | Ajout de sons au tir/explosion/mouvement via API Audio, et création d'un vrai système de particules pour les explosions. | commit F11 |
 | 10 | **F9 :** Afficher et détruire les 4 abris boucliers | fait | 4 blocs verts qui se désagrègent sous les tirs joueurs et ennemis. | commit F9 |
-| 11 | **F10 :** Soucoupe mystère volante | en cours | Un OVNI rouge traversant le haut de l'écran avec un son distinct, donnant un score bonus. | — |
+| 11 | **F10 :** Soucoupe mystère volante | fait | Un OVNI rouge traversant le haut de l'écran avec un son distinct, donnant un score bonus. | commit F10 |
 | — | **Déploiement Netlify** (mise en ligne) | fait | Le site est accessible à l'URL publique Netlify et le joueur peut faire une partie complète en production. | — |
 
 ## Journal des passes de non-régression

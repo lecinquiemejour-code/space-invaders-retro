@@ -64,3 +64,51 @@ export function playExplosionSound() {
 
     noise.start();
 }
+
+let saucerOsc = null;
+let saucerGain = null;
+let lfoOsc = null;
+
+export function startSaucerSound() {
+    if (!audioCtx) return;
+    if (saucerOsc) return; // Déjà en train de jouer
+
+    saucerOsc = audioCtx.createOscillator();
+    saucerGain = audioCtx.createGain();
+
+    saucerOsc.type = 'triangle'; // Un son plus doux que le carré
+    saucerOsc.frequency.setValueAtTime(300, audioCtx.currentTime);
+    
+    // On crée un LFO (Low Frequency Oscillator) pour moduler la fréquence et faire Wou-Wou
+    lfoOsc = audioCtx.createOscillator();
+    lfoOsc.type = 'sine';
+    lfoOsc.frequency.setValueAtTime(4, audioCtx.currentTime); // 4 variations par seconde
+    
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.setValueAtTime(100, audioCtx.currentTime); // L'amplitude de la variation (+- 100 Hz)
+    
+    lfoOsc.connect(lfoGain);
+    lfoGain.connect(saucerOsc.frequency);
+    lfoOsc.start();
+    
+    // Volume bas pour la soucoupe (c'est un son de fond)
+    saucerGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+
+    saucerOsc.connect(saucerGain);
+    saucerGain.connect(audioCtx.destination);
+    
+    saucerOsc.start();
+}
+
+export function stopSaucerSound() {
+    if (saucerOsc) {
+        saucerOsc.stop();
+        saucerOsc.disconnect();
+        saucerOsc = null;
+    }
+    if (lfoOsc) {
+        lfoOsc.stop();
+        lfoOsc.disconnect();
+        lfoOsc = null;
+    }
+}

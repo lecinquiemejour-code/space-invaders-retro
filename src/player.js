@@ -18,6 +18,8 @@ export function createPlayer(canvas) {
         height: PLAYER_HEIGHT,
         speed: PLAYER_SPEED,
         projectile: null,
+        state: "ALIVE", // 'ALIVE' ou 'DEAD'
+        respawnTimer: 0 // Compteur avant réapparition
     };
 }
 
@@ -60,6 +62,11 @@ export function updatePlayer(player, canvas, isKeyPressed) {
 }
 
 export function drawPlayer(ctx, player) {
+    if (player.state === "DEAD") {
+        // Le joueur n'est pas dessiné quand il est en train d'exploser (effet invisible pendant que les particules volent)
+        return;
+    }
+
     ctx.fillStyle = "#00ff00";
 
     // Silhouette composée de rectangles nets pour conserver le style pixel-art.

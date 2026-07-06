@@ -2,8 +2,9 @@ import { initializeInput, isKeyPressed } from "./input.js";
 import { createPlayer, drawPlayer, updatePlayer } from "./player.js";
 import { createSwarm, updateSwarm, drawSwarm, checkCollisions } from "./aliens.js";
 import { createShields, drawShields, checkShieldCollision } from "./shields.js";
-import { initAudio, playExplosionSound } from "./audio.js";
+import { initAudio, playExplosionSound, stopSaucerSound } from "./audio.js";
 import { createParticleSystem, updateParticles, drawParticles, createExplosion } from "./particles.js";
+import { createSaucer, updateSaucer, drawSaucer } from "./saucer.js";
 
 // ==========================================
 // CONFIGURATION INITIALE DU JEU
@@ -19,6 +20,7 @@ let player = createPlayer(canvas);
 let swarm = createSwarm();
 let particleSystem = createParticleSystem();
 let shields = createShields(canvas.width, canvas.height);
+let saucer = createSaucer();
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
@@ -37,12 +39,14 @@ function resetGame() {
     swarm = createSwarm();
     particleSystem = createParticleSystem();
     shields = createShields(canvas.width, canvas.height); // On reconstruit les boucliers neufs
+    saucer = createSaucer();
     gameState = "PLAYING";
 }
 
 function update() {
     // Gestion des écrans hors-jeu (attente de la touche Entrée)
     if (gameState === "START_SCREEN" || gameState === "GAME_OVER" || gameState === "VICTORY") {
+        stopSaucerSound(); // On s'assure que la soucoupe est silencieuse
         if (isKeyPressed("Enter")) {
             initAudio(); // Initialise l'audio (les navigateurs exigent une action de l'utilisateur)
             resetGame();
@@ -51,9 +55,25 @@ function update() {
     }
 
     // --- Logique du jeu en cours (PLAYING) ---
-    updatePlayer(player, canvas, isKeyPressed);
+    // Si le joueur est vivant, il peut jouer. S'il est en train d'exploser, on bloque ses commandes le temps des particules.
+    if (player.state === "ALIVE") {
+        updatePlayer(player, canvas, isKeyPressed);
+    } else {
+        player.respawnTimer--;
+        if (player.respawnTimer <= 0) {
+            if (lives <= 0) {
+                gameState = "GAME_OVER"; // L'écran Game Over s'affiche APRES l'animation d'explosion
+            } else {
+                player.state = "ALIVE";
+                player.x = (canvas.width - player.width) / 2;
+                player.projectile = null;
+            }
+        }
+    }
+
     updateSwarm(swarm, canvas);
     updateParticles(particleSystem);
+    updateSaucer(saucer, canvas.width);
 
     // Vérification des collisions entre le tir du joueur et les aliens
     if (player.projectile) {
@@ -72,6 +92,27 @@ function update() {
         }
     }
 
+    // Vérification de la collision avec la soucoupe rouge
+    if (player.projectile && saucer.active) {
+        if (player.projectile.x < saucer.x + saucer.width &&
+            player.projectile.x + player.projectile.width > saucer.x &&
+            player.projectile.y < saucer.y + saucer.height &&
+            player.projectile.y + player.projectile.height > saucer.y) {
+            
+            // Soucoupe détruite !
+            player.projectile = null;
+            saucer.active = false;
+            saucer.timer = 0;
+            createExplosion(particleSystem, saucer.x + saucer.width/2, saucer.y + saucer.height/2, "#ff0000", 40);
+            playExplosionSound();
+            stopSaucerSound();
+            
+            // Score bonus aléatoire
+            const points = [50, 100, 150, 300];
+            score += points[Math.floor(Math.random() * points.length)];
+        }
+    }
+
     // Vérification des collisions entre les tirs ennemis et le joueur (ou les boucliers)
     for (let i = swarm.projectiles.length - 1; i >= 0; i--) {
         const p = swarm.projectiles[i];
@@ -83,7 +124,8 @@ function update() {
         }
 
         // 2. Le tir tape-t-il le joueur ?
-        if (p.x < player.x + player.width &&
+        if (player.state === "ALIVE" &&
+            p.x < player.x + player.width &&
             p.x + p.width > player.x &&
             p.y < player.y + player.height &&
             p.y + p.height > player.y) {
@@ -92,24 +134,19 @@ function update() {
             swarm.projectiles.splice(i, 1);
             lives--;
             
-            // Explosion de particules et son !
-            createExplosion(particleSystem, player.x + player.width / 2, player.y + player.height / 2, "#00ff00", 30);
+            // Effet spectaculaire de destruction du vaisseau
+            createExplosion(particleSystem, player.x + player.width / 2, player.y + player.height / 2, "#00ff00", 60);
             playExplosionSound();
 
-            // Réinitialise la position du joueur au centre
-            player.x = (canvas.width - player.width) / 2;
-            console.log("Jeu : Le joueur a été touché ! Vies restantes : " + lives);
+            // On change l'état au lieu de le téléporter direct (pour voir les particules !)
+            player.state = "DEAD";
+            player.respawnTimer = 60; // 1 seconde de pause avant de réapparaître ou Game Over
             
             break; // On sort de la boucle pour ne perdre qu'une seule vie à la fois
         }
     }
 
-    // Vérification de défaite (0 vie)
-    if (lives <= 0) {
-        gameState = "GAME_OVER";
-    }
-
-    // Vérification de défaite (Les aliens touchent le joueur)
+    // Vérification de défaite immédiate (Les aliens touchent le joueur)
     for (const alien of swarm.aliens) {
         if (alien.active && swarm.y + alien.relativeY + alien.height >= player.y) {
             gameState = "GAME_OVER";
@@ -145,9 +182,10 @@ function render() {
         return; // On ne dessine pas le jeu derrière
     }
 
-    // 3. Rendu du jeu en cours (vaisseau, boucliers, aliens, scores)
+    // 3. Rendu du jeu en cours
     drawPlayer(ctx, player);
     drawShields(ctx, shields);
+    drawSaucer(ctx, saucer);
     drawSwarm(ctx, swarm);
     drawParticles(ctx, particleSystem);
 
