@@ -1,5 +1,6 @@
 import { initializeInput, isKeyPressed } from "./input.js";
 import { createPlayer, drawPlayer, updatePlayer } from "./player.js";
+import { createSwarm, updateSwarm, drawSwarm } from "./aliens.js";
 
 // ==========================================
 // CONFIGURATION INITIALE DU JEU
@@ -12,6 +13,7 @@ const ctx = canvas.getContext("2d");
 
 initializeInput();
 const player = createPlayer(canvas);
+const swarm = createSwarm();
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
@@ -23,6 +25,7 @@ console.log("Jeu : État initial configuré sur -> " + gameState);
 
 function update() {
     updatePlayer(player, canvas, isKeyPressed);
+    updateSwarm(swarm, canvas);
 }
 
 // ==========================================
@@ -36,6 +39,9 @@ function render() {
 
     // Le vaisseau reste visible pendant cette étape afin de tester son déplacement.
     drawPlayer(ctx, player);
+    
+    // Rendu de la grille d'aliens
+    drawSwarm(ctx, swarm);
 
     // 2. Rendu de l'écran de démarrage
     if (gameState === "START_SCREEN") {
