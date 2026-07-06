@@ -1,0 +1,13 @@
+# Fichiers du copilote VibeCoding
+vibecoding-copilote/
+*.zip
+amorce-prompt.md
+
+# Dépendances Node.js (si installées plus tard)
+node_modules/
+
+# IDE et OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
