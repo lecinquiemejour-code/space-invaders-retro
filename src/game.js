@@ -12,8 +12,8 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 initializeInput();
-const player = createPlayer(canvas);
-const swarm = createSwarm();
+let player = createPlayer(canvas);
+let swarm = createSwarm();
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
@@ -25,7 +25,24 @@ console.log("Jeu : État initial configuré sur -> " + gameState);
 // COMPORTEMENT & LOGIQUE (UPDATE)
 // ==========================================
 
+function resetGame() {
+    score = 0;
+    lives = 3;
+    player = createPlayer(canvas);
+    swarm = createSwarm();
+    gameState = "PLAYING";
+}
+
 function update() {
+    // Gestion des écrans hors-jeu (attente de la touche Entrée)
+    if (gameState === "START_SCREEN" || gameState === "GAME_OVER" || gameState === "VICTORY") {
+        if (isKeyPressed("Enter")) {
+            resetGame();
+        }
+        return; // On fige l'action du jeu
+    }
+
+    // --- Logique du jeu en cours (PLAYING) ---
     updatePlayer(player, canvas, isKeyPressed);
     updateSwarm(swarm, canvas);
 
@@ -58,6 +75,31 @@ function update() {
             break; // On sort de la boucle pour ne perdre qu'une seule vie à la fois
         }
     }
+
+    // Vérification de défaite (0 vie)
+    if (lives <= 0) {
+        gameState = "GAME_OVER";
+    }
+
+    // Vérification de défaite (Les aliens touchent le joueur)
+    for (const alien of swarm.aliens) {
+        if (alien.active && swarm.y + alien.relativeY + alien.height >= player.y) {
+            gameState = "GAME_OVER";
+            break;
+        }
+    }
+
+    // Vérification de victoire (Plus aucun alien actif)
+    let allDead = true;
+    for (const alien of swarm.aliens) {
+        if (alien.active) {
+            allDead = false;
+            break;
+        }
+    }
+    if (allDead) {
+        gameState = "VICTORY";
+    }
 }
 
 // ==========================================
@@ -69,10 +111,14 @@ function render() {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Le vaisseau reste visible pendant cette étape afin de tester son déplacement.
+    // 2. Rendu de l'écran de démarrage seul
+    if (gameState === "START_SCREEN") {
+        drawStartScreen();
+        return; // On ne dessine pas le jeu derrière
+    }
+
+    // 3. Rendu du jeu en cours (vaisseau, aliens, scores)
     drawPlayer(ctx, player);
-    
-    // Rendu de la grille d'aliens
     drawSwarm(ctx, swarm);
 
     // Affichage du score en haut à gauche
@@ -85,9 +131,11 @@ function render() {
     ctx.textAlign = "right";
     ctx.fillText("VIES: " + lives, canvas.width - 10, 30);
 
-    // 2. Rendu de l'écran de démarrage
-    if (gameState === "START_SCREEN") {
-        drawStartScreen();
+    // 4. Écrans superposés de fin de partie
+    if (gameState === "GAME_OVER") {
+        drawGameOverScreen();
+    } else if (gameState === "VICTORY") {
+        drawVictoryScreen();
     }
 }
 
@@ -113,6 +161,36 @@ function drawStartScreen() {
     ctx.fillStyle = "#555555";
     ctx.font = '10px "Press Start 2P"';
     ctx.fillText("VIBECODING L5J - PROJET DEBUTANT", canvas.width / 2, 520);
+}
+
+// Dessin de l'écran Game Over
+function drawGameOverScreen() {
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ff0000"; // Rouge
+    ctx.font = '40px "Press Start 2P"';
+    ctx.fillText("GAME OVER", canvas.width / 2, 250);
+
+    if (Math.floor(Date.now() / 500) % 2 === 0) {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = '16px "Press Start 2P"';
+        ctx.fillText("PRESS ENTER TO RESTART", canvas.width / 2, 340);
+    }
+}
+
+// Dessin de l'écran de Victoire
+function drawVictoryScreen() {
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#00ff00"; // Vert
+    ctx.font = '40px "Press Start 2P"';
+    ctx.fillText("VICTORY!", canvas.width / 2, 250);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = '16px "Press Start 2P"';
+    ctx.fillText("FINAL SCORE: " + score, canvas.width / 2, 300);
+
+    if (Math.floor(Date.now() / 500) % 2 === 0) {
+        ctx.fillText("PRESS ENTER TO PLAY AGAIN", canvas.width / 2, 360);
+    }
 }
 
 // ==========================================
