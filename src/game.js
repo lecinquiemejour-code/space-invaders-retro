@@ -1,4 +1,5 @@
-import { initializeInput } from "./input.js";
+import { initializeInput, isKeyPressed } from "./input.js";
+import { createPlayer, drawPlayer, updatePlayer } from "./player.js";
 
 // ==========================================
 // CONFIGURATION INITIALE DU JEU
@@ -10,6 +11,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 initializeInput();
+const player = createPlayer(canvas);
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
@@ -20,8 +22,7 @@ console.log("Jeu : État initial configuré sur -> " + gameState);
 // ==========================================
 
 function update() {
-    // Pour la feature F1, il n'y a pas encore de déplacement ou d'action de jeu.
-    // Cette fonction servira à recalculer les positions à chaque image.
+    updatePlayer(player, canvas, isKeyPressed);
 }
 
 // ==========================================
@@ -32,6 +33,9 @@ function render() {
     // 1. On efface l'écran en dessinant un rectangle noir sur tout le canvas
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Le vaisseau reste visible pendant cette étape afin de tester son déplacement.
+    drawPlayer(ctx, player);
 
     // 2. Rendu de l'écran de démarrage
     if (gameState === "START_SCREEN") {

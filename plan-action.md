@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | 1 | **F1 :** Initialiser le squelette de l'application (HTML/CSS/JS et favicon) | fait | Un écran noir centré s'affiche à l'adresse locale avec le texte rétro "PRESS ENTER TO START". Aucune erreur de fichier manquant (dont favicon) dans la console. | commit F1 |
 | 2 | **F2 :** Écouter et stocker les entrées clavier | fait | Les touches (Q, D, Flèches, Espace, Entrée) sont capturées en console sans bloquer l'affichage. | commit F2 |
-| 3 | **F3 :** Afficher et déplacer le vaisseau joueur | à faire | Le vaisseau vert fluo s'affiche en bas du Canvas. Il bouge à gauche/droite au clavier et s'arrête exactement sur les bords latéraux. | — |
+| 3 | **F3 :** Afficher et déplacer le vaisseau joueur | fait | Le vaisseau vert fluo s'affiche en bas du Canvas. Il bouge à gauche/droite au clavier et s'arrête exactement sur les bords latéraux. | commit F3 |
 | 4 | **F4 :** Tirer un projectile joueur unique | à faire | L'appui sur Espace lance un projectile blanc vers le haut. On ne peut pas en tirer un autre tant que le premier est à l'écran. | — |
 | 5 | **F5 :** Afficher et déplacer la grille d'aliens | à faire | Une grille de 5 rangées de 11 aliens colorés s'affiche en haut. Elle se déplace horizontalement pas à pas de façon saccadée, descend d'un cran en bordure et change de sens. | — |
 | 6 | **F6 :** Détecter les collisions des tirs joueur avec les aliens | à faire | Toucher un alien le détruit avec une petite explosion de pixels. Le score augmente et la grille d'aliens accélère légèrement. | — |
