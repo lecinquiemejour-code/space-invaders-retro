@@ -1,0 +1,22 @@
+/* Style global pour imiter l'obscurité d'une salle d'arcade */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000; /* Fond noir pur */
+    font-family: 'Press Start 2P', monospace; /* Police rétro pixelisée */
+    overflow: hidden; /* Évite les barres de défilement inutiles */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Style de notre écran de jeu (le Canvas) */
+canvas {
+    background-color: #050505; /* Fond légèrement gris-noir pour délimiter l'écran */
+    border: 4px solid #00ff00; /* Bordure verte fluo d'époque */
+    /* Effet de halo lumineux (glow) typique des affichages CRT rétro */
+    box-shadow: 0 0 20px #00ff00;
+    image-rendering: pixelated; /* Conserve le piqué net des pixels sans flou */
+}

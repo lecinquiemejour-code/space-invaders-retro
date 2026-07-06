@@ -14,7 +14,7 @@
 
 | Ordre | Feature (du FDD) | État | Critère de réussite | Tour / commit |
 |---|---|---|---|---|
-| 1 | **F1 :** Initialiser le squelette de l'application (HTML/CSS/JS et favicon) | à faire | Un écran noir centré s'affiche à l'adresse locale avec le texte rétro "PRESS ENTER TO START". Aucune erreur de fichier manquant (dont favicon) dans la console. | — |
+| 1 | **F1 :** Initialiser le squelette de l'application (HTML/CSS/JS et favicon) | fait | Un écran noir centré s'affiche à l'adresse locale avec le texte rétro "PRESS ENTER TO START". Aucune erreur de fichier manquant (dont favicon) dans la console. | commit F1 |
 | 2 | **F2 :** Écouter et stocker les entrées clavier | à faire | Les touches (Q, D, Flèches, Espace, Entrée) sont capturées en console sans bloquer l'affichage. | — |
 | 3 | **F3 :** Afficher et déplacer le vaisseau joueur | à faire | Le vaisseau vert fluo s'affiche en bas du Canvas. Il bouge à gauche/droite au clavier et s'arrête exactement sur les bords latéraux. | — |
 | 4 | **F4 :** Tirer un projectile joueur unique | à faire | L'appui sur Espace lance un projectile blanc vers le haut. On ne peut pas en tirer un autre tant que le premier est à l'écran. | — |
