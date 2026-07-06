@@ -3,6 +3,8 @@ const PLAYER_HEIGHT = 28;
 const PLAYER_SPEED = 5;
 const BOTTOM_MARGIN = 28;
 
+import { playShootSound } from "./audio.js";
+
 // Propriétés du projectile
 const PROJECTILE_WIDTH = 4;
 const PROJECTILE_HEIGHT = 15;
@@ -41,6 +43,7 @@ export function updatePlayer(player, canvas, isKeyPressed) {
             height: PROJECTILE_HEIGHT,
             speed: PROJECTILE_SPEED
         };
+        playShootSound(); // <-- On joue le bruit du laser !
         console.log("Joueur : Tir d'un projectile !");
     }
 

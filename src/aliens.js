@@ -19,7 +19,6 @@ export function createSwarm() {
         moveTimer: 0, // Compteur pour le mouvement saccadé
         moveInterval: 40, // Nombre de rafraîchissements d'écran avant de bouger
         aliens: [],
-        explosions: [], // Pour stocker les petites explosions temporaires
         projectiles: [] // Tirs ennemis
     };
 
@@ -70,14 +69,6 @@ export function updateSwarm(swarm, canvas) {
         }
     }
 
-    // Mise à jour des explosions (elles durent quelques frames puis disparaissent)
-    for (let i = swarm.explosions.length - 1; i >= 0; i--) {
-        swarm.explosions[i].timer--;
-        if (swarm.explosions[i].timer <= 0) {
-            swarm.explosions.splice(i, 1);
-        }
-    }
-
     // Mise à jour des tirs ennemis
     for (let i = swarm.projectiles.length - 1; i >= 0; i--) {
         swarm.projectiles[i].y += 7; // Vitesse de descente du tir ennemi
@@ -116,7 +107,7 @@ export function updateSwarm(swarm, canvas) {
     }
 }
 
-export function checkCollisions(swarm, projectile) {
+export function checkCollisions(swarm, projectile, ps, playExplosionSound, createExplosion) {
     if (!projectile) return false;
 
     for (const alien of swarm.aliens) {
@@ -137,12 +128,9 @@ export function checkCollisions(swarm, projectile) {
             // La grille accélère légèrement (intervalle plus court, minimum 5)
             swarm.moveInterval = Math.max(5, swarm.moveInterval - 1);
             
-            // On ajoute une explosion à cet endroit
-            swarm.explosions.push({
-                x: alienX,
-                y: alienY,
-                timer: 15 // Durée d'affichage de l'explosion
-            });
+            // On déclenche la VRAIE explosion (particules + son)
+            createExplosion(ps, alienX + alien.width / 2, alienY + alien.height / 2, alien.color, 25);
+            playExplosionSound();
 
             return true; // Le projectile a touché quelque chose
         }
@@ -177,14 +165,6 @@ export function drawSwarm(ctx, swarm) {
             ctx.fillRect(x + 4, y + 16, 6, 4);
             ctx.fillRect(x + 20, y + 16, 6, 4);
         }
-    }
-
-    // Dessin des explosions en blanc
-    ctx.fillStyle = "#ffffff";
-    for (const exp of swarm.explosions) {
-        // Une petite croix pour symboliser l'explosion de pixels
-        ctx.fillRect(exp.x + 12, exp.y, 6, 20);
-        ctx.fillRect(exp.x, exp.y + 7, 30, 6);
     }
 
     // Dessin des tirs ennemis (en rouge)

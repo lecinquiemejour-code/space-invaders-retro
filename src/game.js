@@ -1,6 +1,8 @@
 import { initializeInput, isKeyPressed } from "./input.js";
 import { createPlayer, drawPlayer, updatePlayer } from "./player.js";
 import { createSwarm, updateSwarm, drawSwarm, checkCollisions } from "./aliens.js";
+import { initAudio, playExplosionSound } from "./audio.js";
+import { createParticleSystem, updateParticles, drawParticles, createExplosion } from "./particles.js";
 
 // ==========================================
 // CONFIGURATION INITIALE DU JEU
@@ -14,6 +16,7 @@ const ctx = canvas.getContext("2d");
 initializeInput();
 let player = createPlayer(canvas);
 let swarm = createSwarm();
+let particleSystem = createParticleSystem();
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
@@ -30,6 +33,7 @@ function resetGame() {
     lives = 3;
     player = createPlayer(canvas);
     swarm = createSwarm();
+    particleSystem = createParticleSystem();
     gameState = "PLAYING";
 }
 
@@ -37,6 +41,7 @@ function update() {
     // Gestion des écrans hors-jeu (attente de la touche Entrée)
     if (gameState === "START_SCREEN" || gameState === "GAME_OVER" || gameState === "VICTORY") {
         if (isKeyPressed("Enter")) {
+            initAudio(); // Initialise l'audio (les navigateurs exigent une action de l'utilisateur)
             resetGame();
         }
         return; // On fige l'action du jeu
@@ -45,10 +50,11 @@ function update() {
     // --- Logique du jeu en cours (PLAYING) ---
     updatePlayer(player, canvas, isKeyPressed);
     updateSwarm(swarm, canvas);
+    updateParticles(particleSystem);
 
     // Vérification des collisions entre le tir du joueur et les aliens
     if (player.projectile) {
-        const hit = checkCollisions(swarm, player.projectile);
+        const hit = checkCollisions(swarm, player.projectile, particleSystem, playExplosionSound, createExplosion);
         if (hit) {
             // Le tir disparaît s'il a touché
             player.projectile = null;
@@ -68,6 +74,10 @@ function update() {
             swarm.projectiles.splice(i, 1);
             lives--;
             
+            // Explosion de particules et son !
+            createExplosion(particleSystem, player.x + player.width / 2, player.y + player.height / 2, "#00ff00", 30);
+            playExplosionSound();
+
             // Réinitialise la position du joueur au centre
             player.x = (canvas.width - player.width) / 2;
             console.log("Jeu : Le joueur a été touché ! Vies restantes : " + lives);
@@ -120,6 +130,7 @@ function render() {
     // 3. Rendu du jeu en cours (vaisseau, aliens, scores)
     drawPlayer(ctx, player);
     drawSwarm(ctx, swarm);
+    drawParticles(ctx, particleSystem);
 
     // Affichage du score en haut à gauche
     ctx.fillStyle = "#ffffff";

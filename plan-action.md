@@ -22,6 +22,7 @@
 | 6 | **F6 :** Détecter les collisions des tirs joueur avec les aliens | fait | Toucher un alien le détruit avec une petite explosion de pixels. Le score augmente et la grille d'aliens accélère légèrement. | commit F6 |
 | 7 | **F7 :** Déclencher des tirs aliens et détecter les collisions avec le joueur | fait | Des projectiles ennemis partent aléatoirement vers le bas. Toucher le joueur lui retire une vie et réinitialise sa position. | commit F7 |
 | 8 | **F8 :** Gérer les états de fin de jeu et réinitialisation | fait | Écran "GAME OVER" si 0 vie ou aliens en bas. Écran "VICTORY" si grille vide. L'appui sur Entrée réinitialise scores/vies/jeu. | commit F8 |
+| 9 | **F11 :** Effets sonores 8-bit et particules d'explosions | fait | Ajout de sons au tir/explosion/mouvement via API Audio, et création d'un vrai système de particules pour les explosions. | commit F11 |
 | — | **Déploiement Netlify** (mise en ligne) | fait | Le site est accessible à l'URL publique Netlify et le joueur peut faire une partie complète en production. | — |
 
 ## Journal des passes de non-régression
