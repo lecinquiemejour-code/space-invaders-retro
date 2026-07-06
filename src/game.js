@@ -18,6 +18,7 @@ const swarm = createSwarm();
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
 let score = 0;
+let lives = 3; // Le joueur commence avec 3 vies
 console.log("Jeu : État initial configuré sur -> " + gameState);
 
 // ==========================================
@@ -35,6 +36,26 @@ function update() {
             // Le tir disparaît s'il a touché
             player.projectile = null;
             score += 10; // On augmente le score
+        }
+    }
+
+    // Vérification des collisions entre les tirs ennemis et le joueur
+    for (let i = swarm.projectiles.length - 1; i >= 0; i--) {
+        const p = swarm.projectiles[i];
+        if (p.x < player.x + player.width &&
+            p.x + p.width > player.x &&
+            p.y < player.y + player.height &&
+            p.y + p.height > player.y) {
+            
+            // Le joueur est touché !
+            swarm.projectiles.splice(i, 1);
+            lives--;
+            
+            // Réinitialise la position du joueur au centre
+            player.x = (canvas.width - player.width) / 2;
+            console.log("Jeu : Le joueur a été touché ! Vies restantes : " + lives);
+            
+            break; // On sort de la boucle pour ne perdre qu'une seule vie à la fois
         }
     }
 }
@@ -59,6 +80,10 @@ function render() {
     ctx.font = '16px "Press Start 2P"';
     ctx.textAlign = "left";
     ctx.fillText("SCORE: " + score, 10, 30);
+
+    // Affichage des vies en haut à droite
+    ctx.textAlign = "right";
+    ctx.fillText("VIES: " + lives, canvas.width - 10, 30);
 
     // 2. Rendu de l'écran de démarrage
     if (gameState === "START_SCREEN") {

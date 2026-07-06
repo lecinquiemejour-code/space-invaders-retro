@@ -19,7 +19,8 @@ export function createSwarm() {
         moveTimer: 0, // Compteur pour le mouvement saccadé
         moveInterval: 40, // Nombre de rafraîchissements d'écran avant de bouger
         aliens: [],
-        explosions: [] // Pour stocker les petites explosions temporaires
+        explosions: [], // Pour stocker les petites explosions temporaires
+        projectiles: [] // Tirs ennemis
     };
 
     // Couleurs demandées par le PRD : magenta, cyan, jaune
@@ -74,6 +75,43 @@ export function updateSwarm(swarm, canvas) {
         swarm.explosions[i].timer--;
         if (swarm.explosions[i].timer <= 0) {
             swarm.explosions.splice(i, 1);
+        }
+    }
+
+    // Mise à jour des tirs ennemis
+    for (let i = swarm.projectiles.length - 1; i >= 0; i--) {
+        swarm.projectiles[i].y += 7; // Vitesse de descente du tir ennemi
+        if (swarm.projectiles[i].y > canvas.height) {
+            swarm.projectiles.splice(i, 1);
+        }
+    }
+
+    // Décision de tir ennemi (aléatoire mais seulement par la première ligne)
+    if (Math.random() < 0.02) { // environ 2% de chance par rafraîchissement
+        // 1. Trouver les aliens en "première ligne" (le plus bas dans chaque colonne)
+        const frontLineMap = {};
+        for (const alien of swarm.aliens) {
+            if (alien.active) {
+                // On regroupe par coordonnée X (colonne) et on garde celui qui a le Y (bas) le plus grand
+                if (!frontLineMap[alien.relativeX] || alien.relativeY > frontLineMap[alien.relativeX].relativeY) {
+                    frontLineMap[alien.relativeX] = alien;
+                }
+            }
+        }
+        
+        const frontLineAliens = Object.values(frontLineMap);
+        
+        // 2. Si on a trouvé des candidats, on en tire un au sort
+        if (frontLineAliens.length > 0) {
+            const shooter = frontLineAliens[Math.floor(Math.random() * frontLineAliens.length)];
+            
+            // 3. Création du projectile sous l'alien tireur
+            swarm.projectiles.push({
+                x: swarm.x + shooter.relativeX + shooter.width / 2 - 2,
+                y: swarm.y + shooter.relativeY + shooter.height,
+                width: 4,
+                height: 15
+            });
         }
     }
 }
@@ -147,5 +185,11 @@ export function drawSwarm(ctx, swarm) {
         // Une petite croix pour symboliser l'explosion de pixels
         ctx.fillRect(exp.x + 12, exp.y, 6, 20);
         ctx.fillRect(exp.x, exp.y + 7, 30, 6);
+    }
+
+    // Dessin des tirs ennemis (en rouge)
+    ctx.fillStyle = "#ff0000";
+    for (const p of swarm.projectiles) {
+        ctx.fillRect(p.x, p.y, p.width, p.height);
     }
 }
