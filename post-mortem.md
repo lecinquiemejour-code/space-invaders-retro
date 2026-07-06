@@ -8,7 +8,7 @@
 - Le jeu tourne à 60 FPS constants de manière très fluide avec Canvas natif.
 
 **Écarts par rapport au PRD :**
-- Les *Should have* (boucliers, soucoupe volante) et *Could have* (effets sonores, high score) n'ont pas encore été implémentés dans cette V1, conformément à la méthode qui vise une première version jouable minimale avant l'ajout de bonus.
+- Tous les bonus (boucliers destructibles, soucoupe volante, effets sonores 8-bit et particules d'explosion) ont finalement été implémentés avec succès lors de la phase de V2 (itération supplémentaire), dépassant ainsi les objectifs de la V1 !
 
 ## Ce qui a bien fonctionné
 - **L'approche "Essaim"** pour la grille d'aliens s'est avérée excellente. Gérer une grande boîte globale au lieu de 55 entités distinctes a permis de garder le code de déplacement très simple et totalement fidèle au mouvement d'origine (et aux contraintes de performances).
