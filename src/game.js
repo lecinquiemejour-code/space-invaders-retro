@@ -1,6 +1,7 @@
 import { initializeInput, isKeyPressed } from "./input.js";
 import { createPlayer, drawPlayer, updatePlayer } from "./player.js";
 import { createSwarm, updateSwarm, drawSwarm, checkCollisions } from "./aliens.js";
+import { createShields, drawShields, checkShieldCollision } from "./shields.js";
 import { initAudio, playExplosionSound } from "./audio.js";
 import { createParticleSystem, updateParticles, drawParticles, createExplosion } from "./particles.js";
 
@@ -17,6 +18,7 @@ initializeInput();
 let player = createPlayer(canvas);
 let swarm = createSwarm();
 let particleSystem = createParticleSystem();
+let shields = createShields(canvas.width, canvas.height);
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
@@ -34,6 +36,7 @@ function resetGame() {
     player = createPlayer(canvas);
     swarm = createSwarm();
     particleSystem = createParticleSystem();
+    shields = createShields(canvas.width, canvas.height); // On reconstruit les boucliers neufs
     gameState = "PLAYING";
 }
 
@@ -54,17 +57,32 @@ function update() {
 
     // Vérification des collisions entre le tir du joueur et les aliens
     if (player.projectile) {
-        const hit = checkCollisions(swarm, player.projectile, particleSystem, playExplosionSound, createExplosion);
-        if (hit) {
-            // Le tir disparaît s'il a touché
-            player.projectile = null;
-            score += 10; // On augmente le score
+        // 1. Est-ce que le tir touche un bouclier ?
+        if (checkShieldCollision(shields, player.projectile)) {
+            player.projectile = null; // Le tir est absorbé par le bouclier
+        } 
+        // 2. Sinon, est-ce que le tir touche un alien ?
+        else {
+            const hit = checkCollisions(swarm, player.projectile, particleSystem, playExplosionSound, createExplosion);
+            if (hit) {
+                // Le tir disparaît s'il a touché
+                player.projectile = null;
+                score += 10; // On augmente le score
+            }
         }
     }
 
-    // Vérification des collisions entre les tirs ennemis et le joueur
+    // Vérification des collisions entre les tirs ennemis et le joueur (ou les boucliers)
     for (let i = swarm.projectiles.length - 1; i >= 0; i--) {
         const p = swarm.projectiles[i];
+        
+        // 1. Le tir tape-t-il un bouclier ?
+        if (checkShieldCollision(shields, p)) {
+            swarm.projectiles.splice(i, 1); // Le bouclier absorbe le tir
+            continue; // On passe au tir suivant
+        }
+
+        // 2. Le tir tape-t-il le joueur ?
         if (p.x < player.x + player.width &&
             p.x + p.width > player.x &&
             p.y < player.y + player.height &&
@@ -127,8 +145,9 @@ function render() {
         return; // On ne dessine pas le jeu derrière
     }
 
-    // 3. Rendu du jeu en cours (vaisseau, aliens, scores)
+    // 3. Rendu du jeu en cours (vaisseau, boucliers, aliens, scores)
     drawPlayer(ctx, player);
+    drawShields(ctx, shields);
     drawSwarm(ctx, swarm);
     drawParticles(ctx, particleSystem);
 
