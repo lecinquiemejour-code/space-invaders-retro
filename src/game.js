@@ -1,6 +1,6 @@
 import { initializeInput, isKeyPressed } from "./input.js";
 import { createPlayer, drawPlayer, updatePlayer } from "./player.js";
-import { createSwarm, updateSwarm, drawSwarm } from "./aliens.js";
+import { createSwarm, updateSwarm, drawSwarm, checkCollisions } from "./aliens.js";
 
 // ==========================================
 // CONFIGURATION INITIALE DU JEU
@@ -17,6 +17,7 @@ const swarm = createSwarm();
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
+let score = 0;
 console.log("Jeu : État initial configuré sur -> " + gameState);
 
 // ==========================================
@@ -26,6 +27,16 @@ console.log("Jeu : État initial configuré sur -> " + gameState);
 function update() {
     updatePlayer(player, canvas, isKeyPressed);
     updateSwarm(swarm, canvas);
+
+    // Vérification des collisions entre le tir du joueur et les aliens
+    if (player.projectile) {
+        const hit = checkCollisions(swarm, player.projectile);
+        if (hit) {
+            // Le tir disparaît s'il a touché
+            player.projectile = null;
+            score += 10; // On augmente le score
+        }
+    }
 }
 
 // ==========================================
@@ -42,6 +53,12 @@ function render() {
     
     // Rendu de la grille d'aliens
     drawSwarm(ctx, swarm);
+
+    // Affichage du score en haut à gauche
+    ctx.fillStyle = "#ffffff";
+    ctx.font = '16px "Press Start 2P"';
+    ctx.textAlign = "left";
+    ctx.fillText("SCORE: " + score, 10, 30);
 
     // 2. Rendu de l'écran de démarrage
     if (gameState === "START_SCREEN") {

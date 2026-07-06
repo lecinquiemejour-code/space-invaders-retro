@@ -19,8 +19,8 @@
 | 3 | **F3 :** Afficher et déplacer le vaisseau joueur | fait | Le vaisseau vert fluo s'affiche en bas du Canvas. Il bouge à gauche/droite au clavier et s'arrête exactement sur les bords latéraux. | commit F3 |
 | 4 | **F4 :** Tirer un projectile joueur unique | fait | L'appui sur Espace lance un projectile blanc vers le haut. On ne peut pas en tirer un autre tant que le premier est à l'écran. | commit F4 |
 | 5 | **F5 :** Afficher et déplacer la grille d'aliens | fait | Une grille de 5 rangées de 11 aliens colorés s'affiche en haut. Elle se déplace horizontalement pas à pas de façon saccadée, descend d'un cran en bordure et change de sens. | commit F5 |
-| 6 | **F6 :** Détecter les collisions des tirs joueur avec les aliens | en cours | Toucher un alien le détruit avec une petite explosion de pixels. Le score augmente et la grille d'aliens accélère légèrement. | — |
-| 7 | **F7 :** Déclencher des tirs aliens et détecter les collisions avec le joueur | à faire | Des projectiles ennemis partent aléatoirement vers le bas. Toucher le joueur lui retire une vie et réinitialise sa position. | — |
+| 6 | **F6 :** Détecter les collisions des tirs joueur avec les aliens | fait | Toucher un alien le détruit avec une petite explosion de pixels. Le score augmente et la grille d'aliens accélère légèrement. | commit F6 |
+| 7 | **F7 :** Déclencher des tirs aliens et détecter les collisions avec le joueur | en cours | Des projectiles ennemis partent aléatoirement vers le bas. Toucher le joueur lui retire une vie et réinitialise sa position. | — |
 | 8 | **F8 :** Gérer les états de fin de jeu et réinitialisation | à faire | Écran "GAME OVER" si 0 vie ou aliens en bas. Écran "VICTORY" si grille vide. L'appui sur Entrée réinitialise scores/vies/jeu. | — |
 | — | **Déploiement Netlify** (mise en ligne) | à faire | Le site est accessible à l'URL publique Netlify et le joueur peut faire une partie complète en production. | — |
 
