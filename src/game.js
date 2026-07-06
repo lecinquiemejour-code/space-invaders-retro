@@ -1,3 +1,5 @@
+import { initializeInput } from "./input.js";
+
 // ==========================================
 // CONFIGURATION INITIALE DU JEU
 // ==========================================
@@ -6,6 +8,8 @@ console.log("Jeu : Démarrage de l'initialisation...");
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+initializeInput();
 
 // États possibles du jeu : 'START_SCREEN', 'PLAYING', 'GAME_OVER', 'VICTORY'
 let gameState = "START_SCREEN";
